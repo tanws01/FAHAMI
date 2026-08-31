@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>FAHAMI - Understand Malaysia's Economy</title>
+<meta name="description" content="FAHAMI turns Malaysia's official DOSM economic data into simple, visual, interactive insights. Fahami Ekonomi Malaysia." />
+<link rel="preconnect" href="https://api.data.gov.my" />
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+<div class="watermark" aria-hidden="true"></div>
+<canvas id="confetti-canvas" aria-hidden="true"></canvas>
+
+<!-- ============ Header ============ -->
+<header class="app-header">
+  <div class="brand" data-go="landing" title="Home">
+    <span class="brand-wrap">
+      <span><span class="brand-word">FAHAMI</span></span>
+      <span class="brand-credit" data-i18n="ui.credit">by Tan Wei Siang</span>
+    </span>
+  </div>
+
+  <nav class="topnav" id="topnav" aria-label="Sections">
+    <button data-go="glance" data-i18n="nav.glance">Glance</button>
+    <button data-go="explain" data-i18n="nav.explain">Explainer</button>
+    <button data-go="ask" data-i18n="nav.ask">Ask</button>
+    <button data-go="me" data-i18n="nav.me">My Economy</button>
+    <button data-go="play" data-i18n="nav.play">Playground</button>
+    <button data-go="states" data-i18n="nav.states">My State</button>
+    <button data-go="madani" data-i18n="nav.madani">MADANI</button>
+    <button data-go="learn" data-i18n="nav.learn">Learn</button>
+  </nav>
+
+  <span class="header-spacer"></span>
+
+  <button class="data-pill" id="dataStatus" title="Where the numbers come from">
+    <span class="d"></span><span id="dataStatusText">Checking data...</span>
+  </button>
+  <select class="lang-select" id="langSel" aria-label="Language">
+    <option value="en">English</option>
+    <option value="ms">Bahasa Melayu</option>
+    <option value="zh">&#20013;&#25991;</option>
+    <option value="ta">&#2980;&#2990;&#3007;&#2996;&#3021;</option>
+  </select>
+  <button class="icon-btn" id="themeToggle" title="Toggle light / dark" aria-label="Toggle theme">&#9789;</button>
+</header>
+
+<main class="stage">
+
+  <!-- ============ Landing ============ -->
+  <section class="screen active" data-screen="landing">
+    <div class="hero">
+      <div class="floaties" aria-hidden="true">
+        <span>&#128200;</span><span>&#127974;</span><span>&#128176;</span><span>&#127981;</span>
+        <span>&#128722;</span><span>&#127806;</span><span>&#128188;</span>
+      </div>
+      <span class="badge-live"><span>&#128225;</span> <span data-i18n="hero.badge">Live from DOSM Open Data</span></span>
+      <div class="fahami-mark" data-i18n="hero.mark">FAHAMI &middot; Fahami Ekonomi Malaysia</div>
+      <h1 id="heroBig" data-i18n="hero.big">How is Malaysia's economy doing?</h1>
+      <p class="sub" id="heroSub" data-i18n="hero.sub">The official numbers, minus the jargon. FAHAMI turns Malaysia's real economic data into simple, visual answers you can actually feel.</p>
+      <p class="sub-ms" data-i18n="hero.tagline">Data ekonomi rasmi Malaysia, dijelaskan dengan mudah dan visual.</p>
+      <div class="cta-row">
+        <button class="btn btn-primary" data-magic><span>&#10024;</span> <span data-i18n="hero.magic">Show me the magic</span></button>
+        <button class="btn btn-ghost" data-go="glance" data-i18n="hero.explore">Explore the dashboard</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Economy at a Glance ============ -->
+  <section class="screen" data-screen="glance">
+    <div class="section-head stagger">
+      <div class="eyebrow" data-i18n="glance.eyebrow">See it</div>
+      <h2 class="grad" data-i18n="glance.title">Economy at a glance</h2>
+      <p data-i18n="glance.desc">The pulse of Malaysia in six numbers. Tap any card to have FAHAMI explain it in plain English.</p>
+    </div>
+    <div class="glance-grid stagger" id="glanceGrid"></div>
+    <div class="card flat" style="margin-top:24px">
+      <div class="source-note" id="glanceSource"></div>
+    </div>
+  </section>
+
+  <!-- ============ AI Explainer ============ -->
+  <section class="screen" data-screen="explain">
+    <div class="section-head stagger">
+      <div class="eyebrow" data-i18n="explain.eyebrow">Understand it</div>
+      <h2 class="grad" data-i18n="explain.title">AI economic explainer</h2>
+      <p data-i18n="explain.desc">Pick a topic. FAHAMI builds a plain-English explanation from the latest official figures - what it means, what it doesn't, and why you should care.</p>
+    </div>
+    <div class="chips stagger" id="explainTopics" style="margin-bottom:22px"></div>
+    <div class="card pad-lg" id="explainCard"></div>
+  </section>
+
+  <!-- ============ Ask FAHAMI ============ -->
+  <section class="screen" data-screen="ask">
+    <div class="section-head stagger">
+      <div class="eyebrow" data-i18n="ask.eyebrow">Ask it</div>
+      <h2 class="grad" data-i18n="ask.title">Ask FAHAMI</h2>
+      <p data-i18n="ask.desc">Type a question the way you'd say it out loud. Every answer is grounded in DOSM figures.</p>
+    </div>
+    <div class="card stagger">
+      <div class="ai-byline"><span class="bot">&#129302;</span> <span data-i18n="ask.byline">On-device answers, built from official DOSM data - no numbers are made up.</span></div>
+      <div class="chat" id="chat"></div>
+      <div class="ask-bar">
+        <input class="input" id="askInput" data-i18n-ph="ask.placeholder" placeholder="e.g. why is everything so expensive?" autocomplete="off" />
+        <button class="btn btn-primary" id="askSend" data-i18n="ask.send">Ask</button>
+      </div>
+      <div class="suggests" id="askSuggests"></div>
+    </div>
+  </section>
+
+  <!-- ============ My Economy ============ -->
+  <section class="screen" data-screen="me">
+    <div class="section-head stagger">
+      <div class="eyebrow" data-i18n="me.eyebrow">Make it personal</div>
+      <h2 class="grad" data-i18n="me.title">My economy</h2>
+      <p data-i18n="me.desc">Tell FAHAMI a little about you. It stays in your browser - nothing is sent anywhere - and FAHAMI shows where you sit in Malaysia's economy.</p>
+    </div>
+
+    <div class="card pad-lg stagger" id="meForm">
+      <div class="grid-2">
+        <label class="field">
+          <span class="lab"><span>&#128176;</span> <span data-i18n="me.incomeLabel">Monthly household income</span></span>
+          <span class="input-money"><span class="rm">RM</span>
+            <input class="input" id="inIncome" type="number" inputmode="numeric" placeholder="6000" /></span>
+        </label>
+        <label class="field">
+          <span class="lab"><span>&#128205;</span> <span data-i18n="me.stateLabel">Your state</span></span>
+          <select id="inState"></select>
+        </label>
+      </div>
+      <label class="field">
+        <span class="lab"><span>&#129489;</span> <span data-i18n="me.lifeLabel">What best describes you?</span></span>
+        <div class="seg" id="inLife">
+          <button data-v="student"><span class="emoji">&#127891;</span><span data-i18n="me.life.student">Student</span></button>
+          <button data-v="working"><span class="emoji">&#128188;</span><span data-i18n="me.life.working">Working</span></button>
+          <button data-v="family"><span class="emoji">&#128106;</span><span data-i18n="me.life.family">Family</span></button>
+          <button data-v="business"><span class="emoji">&#127978;</span><span data-i18n="me.life.business">Business</span></button>
+          <button data-v="retired"><span class="emoji">&#127796;</span><span data-i18n="me.life.retired">Retired</span></button>
+          <button data-v="other"><span class="emoji">&#10024;</span><span data-i18n="me.life.other">Other</span></button>
+        </div>
+      </label>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="meBuild"><span>&#10024;</span> <span data-i18n="me.build">Build my snapshot</span></button>
+      </div>
+    </div>
+
+    <div id="meResult" class="hidden"></div>
+  </section>
+
+  <!-- ============ Playground ============ -->
+  <section class="screen" data-screen="play">
+    <div class="section-head stagger">
+      <div class="eyebrow" data-i18n="play.eyebrow">Play with it</div>
+      <h2 class="grad" data-i18n="play.title">Economy playground</h2>
+      <p data-i18n="play.desc">You're in charge. Move the levers and watch FAHAMI trace the chain reaction through the economy - the way economists think about cause and effect.</p>
+    </div>
+
+    <div class="card pad-lg stagger">
+      <div class="card-title"><span>&#127903;</span> <span data-i18n="play.leversH">The levers</span></div>
+      <div class="card-sub" data-i18n="play.leversSub">Drag to change a policy or shock. Everything below updates live.</div>
+
+      <div class="slider-wrap">
+        <div class="slider-head"><span class="name"><span>&#128200;</span> <span data-i18n="play.oprName">Interest rate (OPR)</span></span><span class="big" id="opValOpr">3.0%</span></div>
+        <input type="range" id="opOpr" min="1" max="6" step="0.25" value="3" />
+        <div class="slider-scale"><span data-i18n="play.oprL">1% (cheap loans)</span><span data-i18n="play.oprR">6% (expensive loans)</span></div>
+      </div>
+
+      <div class="slider-wrap">
+        <div class="slider-head"><span class="name"><span>&#127925;</span> <span data-i18n="play.infName">Inflation shock</span></span><span class="big" id="opValInf">0.0%</span></div>
+        <input type="range" id="opInf" min="-3" max="8" step="0.5" value="0" />
+        <div class="slider-scale"><span data-i18n="play.infL">-3% (falling prices)</span><span data-i18n="play.infR">+8% (surging prices)</span></div>
+      </div>
+
+      <div class="slider-wrap">
+        <div class="slider-head"><span class="name"><span>&#128181;</span> <span data-i18n="play.govName">Government spending</span></span><span class="big" id="opValGov">0%</span></div>
+        <input type="range" id="opGov" min="-20" max="20" step="5" value="0" />
+        <div class="slider-scale"><span data-i18n="play.govL">-20% (austerity)</span><span data-i18n="play.govR">+20% (stimulus)</span></div>
+      </div>
+    </div>
+
+    <div class="card pad-lg stagger">
+      <div class="card-title"><span>&#9889;</span> <span data-i18n="play.chainH">The chain reaction</span></div>
+      <div class="card-sub" data-i18n="play.chainSub">Tap a step to see why. This is a simplified teaching model, not a forecast.</div>
+      <div class="chain" id="chain"></div>
+    </div>
+  </section>
+
+  <!-- ============ Malaysia vs Your State ============ -->
+  <section class="screen" data-screen="states">
+    <div class="section-head stagger">
+      <div class="eyebrow" data-i18n="states.eyebrow">Compare it</div>
+      <h2 class="grad" data-i18n="states.title">Malaysia vs your state</h2>
+      <p data-i18n="states.desc">Household incomes vary a lot across the country. See how your state compares with the national picture.</p>
+    </div>
+    <div class="card stagger">
+      <label class="field" style="margin-bottom:0">
+        <span class="lab"><span>&#128205;</span> <span data-i18n="states.choose">Choose a state</span></span>
+        <select id="cmpState"></select>
+      </label>
+    </div>
+    <div id="cmpResult"></div>
+  </section>
+
+  <!-- ============ MADANI Tracker ============ -->
+  <section class="screen" data-screen="madani">
+    <div class="section-head stagger">
+      <div class="eyebrow" data-i18n="madani.eyebrow">Track it</div>
+      <h2 class="grad" data-i18n="madani.title">Ekonomi MADANI tracker</h2>
+      <p data-i18n="madani.desc">Malaysia's economic framework sets targets for growth, jobs, prices and incomes. Here's how the live numbers stack up against them.</p>
+    </div>
+    <div class="stagger" id="madaniList"></div>
+    <p class="disclaimer" data-i18n="madani.disclaimer">Targets are illustrative reference points for education. Progress reflects the latest available DOSM figures against those benchmarks.</p>
+  </section>
+
+  <!-- ============ Learn + Quiz ============ -->
+  <section class="screen" data-screen="learn">
+    <div class="section-head stagger">
+      <div class="eyebrow" data-i18n="learn.eyebrow">Learn it</div>
+      <h2 class="grad" data-i18n="learn.title">Learn economics</h2>
+      <p data-i18n="learn.desc">Bite-sized lessons in plain language. Read a few, then test yourself and collect badges.</p>
+    </div>
+
+    <div class="card stagger">
+      <div class="card-title"><span>&#128218;</span> <span data-i18n="learn.lessonsH">Quick lessons</span></div>
+      <div class="card-sub" data-i18n="learn.lessonsSub">Tap a card to read. Finish one to earn the Scholar badge.</div>
+      <div class="lessons" id="lessonGrid"></div>
+    </div>
+
+    <div class="card pad-lg stagger" id="quizCard">
+      <div class="card-title"><span>&#129504;</span> <span data-i18n="learn.quizH">Test yourself</span></div>
+      <div class="card-sub" id="quizProgress" data-i18n="learn.quizSub">5 quick questions.</div>
+      <div id="quizBody"></div>
+    </div>
+
+    <div class="card stagger">
+      <div class="card-title"><span>&#127942;</span> <span data-i18n="learn.badgesH">Your badges</span></div>
+      <div class="card-sub" data-i18n="learn.badgesSub">Earn these as you explore FAHAMI.</div>
+      <div class="badges" id="badgeRow"></div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ Modal ============ -->
+<div class="modal-back" id="modalBack">
+  <div class="modal" id="modal" role="dialog" aria-modal="true"></div>
+</div>
+
+<!-- ============ Footer credit ============ -->
+<footer class="site-footer">
+  <p class="credit" data-i18n="footer.credit">Created by Tan Wei Siang</p>
+  <p class="own" data-i18n="footer.owned">Fully owned by Tan Wei Siang &middot; Data: DOSM Open Data</p>
+</footer>
+
+<script src="js/i18n.js"></script>
+<script src="js/data.js"></script>
+<script src="js/live.js"></script>
+<script src="js/ai.js"></script>
+<script src="js/fahami.js"></script>
+</body>
+</html>
