@@ -1,0 +1,9 @@
+{
+  "name": "ai-money-guardian",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": { "start": "node server.js" },
+  "engines": { "node": ">=18" },
+  "dependencies": { "@terminal3/t3n-sdk": "latest" }
+}
